@@ -1,5 +1,33 @@
+body {
+    background: #05050a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    color: #0ff;
+    font-family: 'Segoe UI', sans-serif;
+}
 
-    body { background: #05050a; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; color: #0ff; font-family: 'Segoe UI', sans-serif; }
-    #game-container { position: relative; border: 4px solid #333; background: #0a0a12; box-shadow: 0 0 20px #0ff; border-radius: 10px; }
-    canvas { display: block; border-radius: 6px; }
-    #ui { position: absolute; top: -35px; width: 100%; display: flex; justify-content: space-between; font-weight: bold; letter-spacing: 1px; }
+#game-container {
+    position: relative;
+    border: 4px solid #333;
+    background: #0a0a12;
+    box-shadow: 0 0 20px #0ff;
+    border-radius: 10px;
+}
+
+canvas {
+    display: block;
+    border-radius: 6px;
+}
+
+#ui {
+    position: absolute;
+    top: -35px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
