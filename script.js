@@ -3,8 +3,8 @@ const ctx = canvas.getContext('2d');
 canvas.width = 400; canvas.height = 600;
 
 let score = 0; let lives = 3;
-const gravity = 0.02; 
-const maxSpeed = 5; // 1. Limit definiert
+const gravity = 0.05; 
+const maxSpeed = 57; // 1. Limit definiert
 const ball = { x: 200, y: 50, vx: 0, vy: 0, radius: 8 };
 
 const fWidth = 125; const fHeight = 18;
