@@ -4,6 +4,7 @@ canvas.width = 400; canvas.height = 600;
 
 let score = 0; let lives = 3;
 const gravity = 0.2; 
+const maxSpeed = 15; // 1. Limit definiert
 const ball = { x: 200, y: 50, vx: 0, vy: 0, radius: 8 };
 
 const fWidth = 125; const fHeight = 18;
@@ -22,10 +23,20 @@ window.addEventListener('keyup', e => {
 });
 
 function spawn() {
-    ball.x = 180 + Math.random() * 40; // Nicht immer exakt die Mitte
+    ball.x = 180 + Math.random() * 40; 
     ball.y = 40;
-    ball.vx = (Math.random() - 0.5) * 4; // Start-Schwung zur Seite
+    ball.vx = (Math.random() - 0.5) * 4; 
     ball.vy = 2;
+}
+
+// 2. Hilfsfunktion zur Begrenzung
+function limitSpeed() {
+    const speed = Math.sqrt(ball.vx**2 + ball.vy**2);
+    if (speed > maxSpeed) {
+        const ratio = maxSpeed / speed;
+        ball.vx *= ratio;
+        ball.vy *= ratio;
+    }
 }
 
 function collideFlipper(f) {
@@ -38,36 +49,34 @@ function collideFlipper(f) {
 
     let fXStart = f.isLeft ? 0 : -fWidth;
     
-    // Kollisionsprüfung
     if (localX > fXStart - ball.radius && localX < fXStart + fWidth + ball.radius &&
         localY > -fHeight/2 - ball.radius && localY < fHeight/2 + ball.radius) {
         
-        // Wenn der Flipper sich bewegt (Schlag)
         if (Math.abs(f.targetAngle - f.angle) > 0.01) {
             let speed = Math.sqrt(ball.vx**2 + ball.vy**2);
             let outAngle = f.angle - Math.PI/2;
             ball.vx = Math.cos(outAngle) * (speed + 12);
             ball.vy = Math.sin(outAngle) * (speed + 12);
-            ball.y -= 15; // Rausheben[cite: 1]
+            ball.y -= 15; 
         } else {
-            // Abroll-Logik wenn Flipper stillsteht[cite: 1]
             let rollForce = Math.sin(f.angle) * 0.5;
             ball.vx += rollForce;
-            ball.vy *= -0.2; // Dämpfung
-            ball.y = f.y + (localX * Math.sin(f.angle)) - 25; // Bleibt auf Oberfläche
+            ball.vy *= -0.2; 
+            ball.y = f.y + (localX * Math.sin(f.angle)) - 25; 
         }
         
-        // Verhindern dass der Ball perfekt stillsteht[cite: 1]
         if(Math.abs(ball.vx) < 0.1) ball.vx = f.isLeft ? 0.2 : -0.2;
+        limitSpeed(); // Nach Flipper-Kontakt prüfen
     }
 }
 
 function update() {
-    // 8x Substepping für Präzision[cite: 1]
     for (let i = 0; i < 8; i++) {
         ball.vy += gravity / 8;
         ball.x += ball.vx / 8;
         ball.y += ball.vy / 8;
+
+        limitSpeed(); // Permanent während der Bewegung prüfen[cite: 1]
 
         if (ball.x < ball.radius || ball.x > canvas.width - ball.radius) {
             ball.vx *= -0.6; 
@@ -88,6 +97,7 @@ function update() {
         if (dist < ball.radius + b.r) {
             let angle = Math.atan2(dy, dx);
             ball.vx = Math.cos(angle) * 12; ball.vy = Math.sin(angle) * 12;
+            limitSpeed(); // Nach Bumper-Stoß prüfen[cite: 1]
             score += 50; document.getElementById('score').innerText = score;
         }
     });
@@ -102,14 +112,12 @@ function update() {
 function draw() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     
-    // Bumper
     bumpers.forEach(b => {
         ctx.beginPath(); ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
         ctx.fillStyle = "#ff007f"; ctx.fill();
         ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
     });
 
-    // Flipper
     ctx.fillStyle = "#0ff";
     [leftF, rightF].forEach(f => {
         ctx.save();
@@ -119,7 +127,6 @@ function draw() {
         ctx.restore();
     });
 
-    // Ball
     ctx.beginPath(); ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
     ctx.fillStyle = "#fff"; ctx.shadowBlur = 10; ctx.shadowColor = "#fff"; ctx.fill(); ctx.closePath();
     ctx.shadowBlur = 0;
